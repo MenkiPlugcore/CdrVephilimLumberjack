@@ -6,7 +6,7 @@
 
     <groupId>id.cdr</groupId>
     <artifactId>CdrVephilimLumberjack</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <name>CdrVephilimLumberjack</name>
     <description>MMORPG-style per-player lumber gathering for Vephilim Roleplay.</description>
 
