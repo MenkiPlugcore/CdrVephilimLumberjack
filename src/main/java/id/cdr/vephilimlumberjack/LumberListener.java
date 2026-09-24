@@ -3,6 +3,7 @@ package id.cdr.vephilimlumberjack;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,6 +42,12 @@ public final class LumberListener implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
+
+        if (!Tag.LOGS.isTagged(block.getType())) {
+            action(player, plugin.message("messages.hit-leaves", "&eTebang bagian batang pohon."));
+            return;
+        }
+
         long remaining = plugin.cooldowns().remainingMillis(player.getUniqueId(), node.id());
         if (remaining > 0L) {
             long seconds = Math.max(1L, (remaining + 999L) / 1000L);
