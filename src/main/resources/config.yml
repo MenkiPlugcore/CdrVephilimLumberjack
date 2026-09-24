@@ -7,6 +7,12 @@ settings:
   durability-per-hit: 1
   reward-amount: 1
 
+chop-range:
+  enabled: true
+  # Jarak maksimum player dari batang terdekat dalam satu node pohon.
+  # Set 0 atau enabled: false untuk menonaktifkan batas jarak.
+  max-distance: 3.5
+
 visual:
   enabled: true
   harvested-fallback-log-material: STRIPPED_OAK_LOG
@@ -39,6 +45,7 @@ messages:
   prefix: '&8[&6Vephilim Lumber&8] &r'
   wrong-tool: '&cGunakan Diamond Axe untuk menebang pohon ini.'
   hit-leaves: '&eTebang bagian batang pohon.'
+  too-far: '&cTerlalu jauh dari pohon. &7Maks. &f{distance} blok'
   cooldown: '&7Pohon ini sedang tumbuh kembali. &f{seconds}s'
   progress: '&6Menebang... &f{bar} &7({hit}/{max})'
   harvested: '&a+{amount} Vephilim Timber'
