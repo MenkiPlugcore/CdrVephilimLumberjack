@@ -1,5 +1,6 @@
 package id.cdr.vephilimlumberjack;
 
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Tag;
@@ -47,65 +48,64 @@ public final class LumberCommand implements CommandExecutor, TabCompleter {
             return;
         }
         if (args.length < 2) {
-            sender.sendMessage(color("&e/lumber node <create|remove|list|info>"));
+            ui(sender, "&e/lumber node <create|remove|list|info>");
             return;
         }
 
         switch (args[1].toLowerCase(Locale.ROOT)) {
             case "create" -> {
                 if (!(sender instanceof Player player)) {
-                    sender.sendMessage(color("&cCommand ini harus dijalankan oleh player."));
+                    ui(sender, "&cCommand ini harus dijalankan oleh player.");
                     return;
                 }
                 if (args.length < 3) {
-                    sender.sendMessage(color("&e/lumber node create <id>"));
+                    ui(sender, "&e/lumber node create <id>");
                     return;
                 }
                 Block target = player.getTargetBlockExact(6);
                 if (target == null || !Tag.LOGS.isTagged(target.getType())) {
-                    sender.sendMessage(color("&cArahkan crosshair ke blok log pohon dalam jarak 6 blok."));
+                    ui(sender, "&cArahkan crosshair ke blok log pohon dalam jarak 6 blok.");
                     return;
                 }
                 if (plugin.nodes().get(args[2]) != null) {
-                    sender.sendMessage(color("&cNode dengan ID itu sudah ada."));
+                    ui(sender, "&cNode dengan ID itu sudah ada.");
                     return;
                 }
                 TreeNode node = plugin.nodes().create(args[2], target);
-                sender.sendMessage(color("&aNode &f" + node.id() + " &aberhasil dibuat di &f"
-                        + node.worldName() + " " + node.x() + " " + node.y() + " " + node.z() + "&a."));
+                ui(sender, "&aNode &f" + node.id() + " &aberhasil dibuat di &f"
+                        + node.worldName() + " " + node.x() + " " + node.y() + " " + node.z() + "&a.");
             }
             case "remove" -> {
                 if (args.length < 3) {
-                    sender.sendMessage(color("&e/lumber node remove <id>"));
+                    ui(sender, "&e/lumber node remove <id>");
                     return;
                 }
-                if (plugin.nodes().remove(args[2])) sender.sendMessage(color("&aNode berhasil dihapus."));
-                else sender.sendMessage(color("&cNode tidak ditemukan."));
+                if (plugin.nodes().remove(args[2])) ui(sender, "&aNode berhasil dihapus.");
+                else ui(sender, "&cNode tidak ditemukan.");
             }
             case "list" -> {
                 Collection<TreeNode> nodes = plugin.nodes().all();
                 if (nodes.isEmpty()) {
-                    sender.sendMessage(color("&7Belum ada lumber node."));
+                    ui(sender, "&7Belum ada lumber node.");
                     return;
                 }
-                sender.sendMessage(color("&6Lumber Nodes &7(" + nodes.size() + "): &f"
-                        + nodes.stream().map(TreeNode::id).collect(Collectors.joining(", "))));
+                ui(sender, "&6Lumber Nodes &7(" + nodes.size() + "): &f"
+                        + nodes.stream().map(TreeNode::id).collect(Collectors.joining(", ")));
             }
             case "info" -> {
                 if (args.length < 3) {
-                    sender.sendMessage(color("&e/lumber node info <id>"));
+                    ui(sender, "&e/lumber node info <id>");
                     return;
                 }
                 TreeNode node = plugin.nodes().get(args[2]);
                 if (node == null) {
-                    sender.sendMessage(color("&cNode tidak ditemukan."));
+                    ui(sender, "&cNode tidak ditemukan.");
                     return;
                 }
-                sender.sendMessage(color("&6Node: &f" + node.id()));
-                sender.sendMessage(color("&7Lokasi: &f" + node.worldName() + " " + node.x() + " " + node.y() + " " + node.z()));
-                sender.sendMessage(color("&7Block: &f" + (node.block() == null ? "WORLD_UNLOADED" : node.block().getType().name())));
+                ui(sender, "&6" + node.id() + " &7| &f" + node.worldName() + " " + node.x() + " " + node.y() + " " + node.z()
+                        + " &7| &f" + (node.block() == null ? "WORLD_UNLOADED" : node.block().getType().name()));
             }
-            default -> sender.sendMessage(color("&e/lumber node <create|remove|list|info>"));
+            default -> ui(sender, "&e/lumber node <create|remove|list|info>");
         }
     }
 
@@ -115,13 +115,13 @@ public final class LumberCommand implements CommandExecutor, TabCompleter {
             return;
         }
         if (args.length < 3 || !args[1].equalsIgnoreCase("give")) {
-            sender.sendMessage(color("&e/lumber timber give <player> [amount]"));
+            ui(sender, "&e/lumber timber give <player> [amount]");
             return;
         }
 
         Player target = Bukkit.getPlayerExact(args[2]);
         if (target == null) {
-            sender.sendMessage(color("&cPlayer tidak online."));
+            ui(sender, "&cPlayer tidak online.");
             return;
         }
 
@@ -130,7 +130,7 @@ public final class LumberCommand implements CommandExecutor, TabCompleter {
             try {
                 amount = Math.max(1, Math.min(2304, Integer.parseInt(args[3])));
             } catch (NumberFormatException ex) {
-                sender.sendMessage(color("&cAmount tidak valid."));
+                ui(sender, "&cAmount tidak valid.");
                 return;
             }
         }
@@ -143,7 +143,7 @@ public final class LumberCommand implements CommandExecutor, TabCompleter {
                     .forEach(leftover -> target.getWorld().dropItemNaturally(target.getLocation(), leftover));
             remaining -= stackAmount;
         }
-        sender.sendMessage(color("&aMemberikan &f" + amount + " Vephilim Timber &ake &f" + target.getName() + "&a."));
+        ui(sender, "&aMemberikan &f" + amount + " Vephilim Timber &ake &f" + target.getName() + "&a.");
     }
 
     private void handleReload(CommandSender sender) {
@@ -152,7 +152,7 @@ public final class LumberCommand implements CommandExecutor, TabCompleter {
             return;
         }
         plugin.reloadPlugin();
-        sender.sendMessage(color("&aCdrVephilimLumberjack berhasil direload."));
+        ui(sender, "&aCdrVephilimLumberjack berhasil direload.");
     }
 
     private void handleStatus(CommandSender sender) {
@@ -160,27 +160,29 @@ public final class LumberCommand implements CommandExecutor, TabCompleter {
             noPermission(sender);
             return;
         }
-        sender.sendMessage(color("&6CdrVephilimLumberjack &fv" + plugin.getPluginMeta().getVersion()));
-        sender.sendMessage(color("&7Nodes: &f" + plugin.nodes().size()));
-        sender.sendMessage(color("&7Hits per harvest: &f" + plugin.getConfig().getInt("settings.hits-required", 3)));
-        sender.sendMessage(color("&7Cooldown: &f" + plugin.getConfig().getLong("settings.node-cooldown-seconds", 30L) + "s"));
-        sender.sendMessage(color("&7Required tool: &f" + plugin.requiredTool().name()));
-        sender.sendMessage(color("&7Economy integration: &f" + (Bukkit.getPluginManager().isPluginEnabled("CdrVephilimEconomy") ? "DETECTED" : "NOT DETECTED")));
+        String economy = Bukkit.getPluginManager().isPluginEnabled("CdrVephilimEconomy") ? "DETECTED" : "NOT DETECTED";
+        ui(sender, "&6Lumberjack &fv" + plugin.getPluginMeta().getVersion()
+                + " &7| Nodes: &f" + plugin.nodes().size()
+                + " &7| Hits: &f" + plugin.getConfig().getInt("settings.hits-required", 3)
+                + " &7| Cooldown: &f" + plugin.getConfig().getLong("settings.node-cooldown-seconds", 30L) + "s"
+                + " &7| Economy: &f" + economy);
     }
 
     private void help(CommandSender sender) {
-        sender.sendMessage(color("&6CdrVephilimLumberjack"));
-        sender.sendMessage(color("&e/lumber node create <id>"));
-        sender.sendMessage(color("&e/lumber node remove <id>"));
-        sender.sendMessage(color("&e/lumber node list"));
-        sender.sendMessage(color("&e/lumber node info <id>"));
-        sender.sendMessage(color("&e/lumber timber give <player> [amount]"));
-        sender.sendMessage(color("&e/lumber reload"));
-        sender.sendMessage(color("&e/lumber status"));
+        ui(sender, "&6/lumber &7| &fnode create/remove/list/info &7| &ftimber give &7| &freload &7| &fstatus");
     }
 
     private void noPermission(CommandSender sender) {
-        sender.sendMessage(color("&cKamu tidak memiliki permission untuk command ini."));
+        ui(sender, "&cKamu tidak memiliki permission untuk command ini.");
+    }
+
+    private void ui(CommandSender sender, String input) {
+        String colored = color(input);
+        if (sender instanceof Player player) {
+            player.sendActionBar(LegacyComponentSerializer.legacySection().deserialize(colored));
+            return;
+        }
+        sender.sendMessage(colored);
     }
 
     private String color(String input) {
