@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.5
+
+Dual-click chopping input patch.
+
+- Registered lumber logs can now be chopped with either left click or right click.
+- Left-click and right-click hits share the same per-player 3-hit progress state.
+- Existing hit delay, durability cost, ActionBar feedback, cooldown, and reward rules apply identically to both inputs.
+- Right-click interactions on registered tree blocks are cancelled so Diamond Axes cannot strip the real server log or trigger vanilla block interaction side effects.
+- Off-hand interaction events remain ignored to prevent duplicate right-click hits.
+
 ## 0.1.4
 
 Solid harvested-tree visual patch.
