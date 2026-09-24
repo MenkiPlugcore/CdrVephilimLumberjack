@@ -32,13 +32,17 @@ public final class LumberListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
     public void onInteract(PlayerInteractEvent event) {
-        if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+        Action interactAction = event.getAction();
+        if (interactAction != Action.LEFT_CLICK_BLOCK && interactAction != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getHand() != null && event.getHand() != EquipmentSlot.HAND) return;
         Block block = event.getClickedBlock();
         if (block == null) return;
 
         TreeNode node = plugin.nodes().getByBlock(block);
         if (node == null) return;
+
+        // Registered tree interactions are owned by the lumber system. This also
+        // prevents right-clicking with an axe from stripping the real server log.
         event.setCancelled(true);
 
         Player player = event.getPlayer();
