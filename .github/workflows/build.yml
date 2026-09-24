@@ -17,3 +17,10 @@ jobs:
           cache: maven
       - name: Build plugin
         run: mvn -B clean package
+      - name: Upload plugin jar
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: CdrVephilimLumberjack-${{ github.sha }}
+          path: target/CdrVephilimLumberjack-*.jar
+          if-no-files-found: error
