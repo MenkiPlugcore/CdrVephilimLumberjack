@@ -56,6 +56,10 @@ public final class LumberListener implements Listener {
             return;
         }
 
+        // Safety net: if an older scheduled restore was missed, make the original
+        // tree visible again as soon as the node is actually available.
+        plugin.visuals().restoreIfReady(player, node);
+
         Material requiredTool = plugin.requiredTool();
         ItemStack hand = player.getInventory().getItemInMainHand();
         if (hand.getType() != requiredTool) {
