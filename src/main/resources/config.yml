@@ -9,7 +9,8 @@ settings:
 
 visual:
   enabled: true
-  stump-material: STRIPPED_OAK_LOG
+  harvested-fallback-log-material: STRIPPED_OAK_LOG
+  harvested-leaf-material: BROWN_STAINED_GLASS
   scan-radius: 7
   leaf-radius: 2
   max-blocks: 160
