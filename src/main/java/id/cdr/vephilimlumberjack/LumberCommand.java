@@ -64,16 +64,21 @@ public final class LumberCommand implements CommandExecutor, TabCompleter {
                 }
                 Block target = player.getTargetBlockExact(6);
                 if (target == null || !Tag.LOGS.isTagged(target.getType())) {
-                    ui(sender, "&cArahkan crosshair ke blok log pohon dalam jarak 6 blok.");
+                    ui(sender, "&cArahkan crosshair ke batang pohon dalam jarak 6 blok.");
                     return;
                 }
                 if (plugin.nodes().get(args[2]) != null) {
                     ui(sender, "&cNode dengan ID itu sudah ada.");
                     return;
                 }
+                TreeNode owner = plugin.nodes().getByBlock(target);
+                if (owner != null) {
+                    ui(sender, "&cPohon ini sudah terdaftar sebagai &f" + owner.id() + "&c.");
+                    return;
+                }
+
                 TreeNode node = plugin.nodes().create(args[2], target);
-                ui(sender, "&aNode &f" + node.id() + " &aberhasil dibuat di &f"
-                        + node.worldName() + " " + node.x() + " " + node.y() + " " + node.z() + "&a.");
+                ui(sender, "&aNode &f" + node.id() + " &adibuat. &7Batang + daun: &f" + plugin.nodes().blockCount(node) + " blok");
             }
             case "remove" -> {
                 if (args.length < 3) {
@@ -102,8 +107,9 @@ public final class LumberCommand implements CommandExecutor, TabCompleter {
                     ui(sender, "&cNode tidak ditemukan.");
                     return;
                 }
-                ui(sender, "&6" + node.id() + " &7| &f" + node.worldName() + " " + node.x() + " " + node.y() + " " + node.z()
-                        + " &7| &f" + (node.block() == null ? "WORLD_UNLOADED" : node.block().getType().name()));
+                ui(sender, "&6" + node.id()
+                        + " &7| &f" + node.worldName() + " " + node.x() + " " + node.y() + " " + node.z()
+                        + " &7| Tree blocks: &f" + plugin.nodes().blockCount(node));
             }
             default -> ui(sender, "&e/lumber node <create|remove|list|info>");
         }
