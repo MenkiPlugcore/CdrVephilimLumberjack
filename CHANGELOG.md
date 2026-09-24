@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.4
+
+Solid harvested-tree visual patch.
+
+- Replaced invisible AIR-based harvested visuals with a solid dead-tree state.
+- Registered logs now appear as the stripped variant of the same wood type while the node is cooling down.
+- Original log axis is preserved so trunks and branches keep their orientation.
+- Registered leaves now use a configurable solid harvested material, defaulting to `BROWN_STAINED_GLASS`.
+- Unexpected captured blocks are kept visually identical to the live world instead of being hidden.
+- Removed the misleading ghost-block situation where a player could see empty space but still collide with the real server block.
+- Harvested visuals remain per-player and restore to the exact original tree when cooldown ends.
+
 ## 0.1.3
 
 Tree visual restore reliability patch.
