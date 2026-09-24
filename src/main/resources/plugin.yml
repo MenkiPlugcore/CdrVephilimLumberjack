@@ -1,5 +1,5 @@
 name: CdrVephilimLumberjack
-version: '0.1.0'
+version: '0.1.1'
 main: id.cdr.vephilimlumberjack.CdrVephilimLumberjack
 api-version: '1.21.11'
 authors: [MenkiPlugcore]
