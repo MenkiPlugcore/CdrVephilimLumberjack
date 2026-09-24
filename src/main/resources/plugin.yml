@@ -1,10 +1,11 @@
 name: CdrVephilimLumberjack
-version: '0.1.5'
+version: '0.2.0'
 main: id.cdr.vephilimlumberjack.CdrVephilimLumberjack
 api-version: '1.21.11'
 authors: [MenkiPlugcore]
 description: MMORPG-style per-player lumber gathering for Vephilim Roleplay.
 website: https://github.com/MenkiPlugcore/CdrVephilimLumberjack
+depend: [Citizens, Vault]
 softdepend: [CdrVephilimEconomy]
 
 commands:
