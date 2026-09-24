@@ -1,8 +1,10 @@
 package id.cdr.vephilimlumberjack;
 
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CdrVephilimLumberjack extends JavaPlugin {
@@ -34,6 +36,8 @@ public final class CdrVephilimLumberjack extends JavaPlugin {
         command.setTabCompleter(lumberCommand);
 
         getServer().getPluginManager().registerEvents(new LumberListener(this), this);
+        setupTimberSellerNpc();
+
         getLogger().info("CdrVephilimLumberjack v" + getPluginMeta().getVersion() + " enabled with " + nodeManager.size() + " node(s).");
     }
 
@@ -47,6 +51,18 @@ public final class CdrVephilimLumberjack extends JavaPlugin {
         reloadConfig();
         nodeManager.load();
         cooldownManager.load();
+    }
+
+    private void setupTimberSellerNpc() {
+        RegisteredServiceProvider<Economy> registration = getServer().getServicesManager().getRegistration(Economy.class);
+        if (registration == null || registration.getProvider() == null) {
+            getLogger().warning("Vault ditemukan tetapi tidak ada Economy provider. Timber seller NPC dinonaktifkan.");
+            return;
+        }
+
+        getServer().getPluginManager().registerEvents(
+                new TimberSellNpcListener(this, registration.getProvider()), this);
+        getLogger().info("Timber seller NPC system enabled through Citizens + Vault.");
     }
 
     public NodeManager nodes() {
