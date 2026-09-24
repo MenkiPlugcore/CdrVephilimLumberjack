@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.0
+
+Dedicated Timber seller NPC system.
+
+- Added Citizens NPC integration dedicated to selling `Vephilim Timber`.
+- Seller NPC IDs are configured directly in `config.yml`.
+- Each NPC can have its own configurable `price-per-timber`.
+- Right-clicking a configured seller NPC sells all tagged Vephilim Timber from the player's storage inventory.
+- Vanilla logs and renamed lookalikes are rejected because selling validates the Timber PersistentDataContainer tag.
+- Payments are deposited through Vault's active Economy provider.
+- Sale feedback remains ActionBar-only to keep player chat clean.
+- Added interaction throttling to prevent repeated double transactions.
+- Failed Vault deposits automatically return the removed Timber to the player, dropping overflow safely if inventory is full.
+- Citizens and Vault are now required runtime dependencies for the seller system.
+
 ## 0.1.5
 
 Dual-click chopping input patch.
