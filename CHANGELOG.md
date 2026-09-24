@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.1
+
+Configurable chopping proximity patch.
+
+- Added a server-side chop range check for registered lumber nodes.
+- Chopping only progresses when the player is within the configured distance of any registered trunk block in that tree.
+- Range validation applies to both left-click and right-click chopping.
+- Being too far does not consume durability, increment hit progress, start cooldown, or award Timber.
+- Added `chop-range.enabled` and `chop-range.max-distance` configuration options.
+- Default maximum chopping distance is 3.5 blocks.
+- Setting `max-distance` to `0` or disabling the range section turns the proximity restriction off.
+- Out-of-range feedback remains ActionBar-only.
+
 ## 0.2.0
 
 Dedicated Timber seller NPC system.
