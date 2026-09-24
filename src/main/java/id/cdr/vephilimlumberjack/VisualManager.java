@@ -4,8 +4,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
+import org.bukkit.Axis;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Orientable;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -30,21 +32,26 @@ public final class VisualManager {
         if (visualBlocks.isEmpty() && root != null) visualBlocks = List.of(root);
         if (visualBlocks.isEmpty()) return;
 
-        Block stumpBlock = findLowestLog(visualBlocks, root);
-
-        Material stump = Material.matchMaterial(plugin.getConfig().getString("visual.stump-material", "STRIPPED_OAK_LOG"));
-        if (stump == null || !stump.isBlock()) stump = Material.STRIPPED_OAK_LOG;
-        BlockData air = Material.AIR.createBlockData();
-        BlockData stumpData = stump.createBlockData();
+        Material deadLeaf = resolveDeadLeafMaterial();
+        BlockData deadLeafData = deadLeaf.createBlockData();
 
         List<Location> changed = new ArrayList<>();
         for (Block block : visualBlocks) {
             changed.add(block.getLocation());
-            if (stumpBlock != null && sameBlock(block, stumpBlock)) {
-                player.sendBlockChange(block.getLocation(), stumpData);
-            } else {
-                player.sendBlockChange(block.getLocation(), air);
+
+            if (Tag.LOGS.isTagged(block.getType())) {
+                player.sendBlockChange(block.getLocation(), harvestedLogData(block));
+                continue;
             }
+
+            if (Tag.LEAVES.isTagged(block.getType())) {
+                player.sendBlockChange(block.getLocation(), deadLeafData);
+                continue;
+            }
+
+            // Keep any unexpected captured block visually identical to the real world.
+            // Never fake AIR here because server-side collision still exists.
+            player.sendBlockChange(block.getLocation(), block.getBlockData());
         }
 
         hiddenViews.computeIfAbsent(player.getUniqueId(), ignored -> new HashMap<>())
@@ -101,7 +108,7 @@ public final class VisualManager {
         }
 
         // A Bukkit tick can run a few milliseconds before the wall-clock cooldown expires.
-        // Reschedule for the exact remaining time so the client-side tree can never stay stuck as a stump.
+        // Reschedule for the exact remaining time so the harvested visual can never remain stale.
         scheduleRestore(player, node, remaining);
     }
 
@@ -122,26 +129,68 @@ public final class VisualManager {
         }, 10L);
     }
 
+    private BlockData harvestedLogData(Block block) {
+        Material original = block.getType();
+        Material stripped = strippedVariant(original);
+        if (stripped == null || !stripped.isBlock() || !stripped.isSolid()) {
+            stripped = resolveFallbackLogMaterial();
+        }
+
+        BlockData replacement = stripped.createBlockData();
+        BlockData originalData = block.getBlockData();
+
+        if (originalData instanceof Orientable originalOrientable
+                && replacement instanceof Orientable replacementOrientable) {
+            Axis axis = originalOrientable.getAxis();
+            if (replacementOrientable.getAxes().contains(axis)) {
+                replacementOrientable.setAxis(axis);
+            }
+        }
+        return replacement;
+    }
+
+    private Material strippedVariant(Material original) {
+        String name = original.name();
+        if (name.startsWith("STRIPPED_")) return original;
+
+        String strippedName = null;
+        if (name.endsWith("_LOG")) {
+            strippedName = "STRIPPED_" + name;
+        } else if (name.endsWith("_WOOD")) {
+            strippedName = "STRIPPED_" + name;
+        } else if (name.endsWith("_STEM")) {
+            strippedName = "STRIPPED_" + name;
+        } else if (name.endsWith("_HYPHAE")) {
+            strippedName = "STRIPPED_" + name;
+        } else if (name.equals("BAMBOO_BLOCK")) {
+            strippedName = "STRIPPED_BAMBOO_BLOCK";
+        }
+
+        return strippedName == null ? null : Material.matchMaterial(strippedName);
+    }
+
+    private Material resolveFallbackLogMaterial() {
+        Material material = Material.matchMaterial(plugin.getConfig().getString(
+                "visual.harvested-fallback-log-material", "STRIPPED_OAK_LOG"));
+        if (material == null || !material.isBlock() || !material.isSolid()) {
+            return Material.STRIPPED_OAK_LOG;
+        }
+        return material;
+    }
+
+    private Material resolveDeadLeafMaterial() {
+        Material material = Material.matchMaterial(plugin.getConfig().getString(
+                "visual.harvested-leaf-material", "BROWN_STAINED_GLASS"));
+        if (material == null || !material.isBlock() || !material.isSolid()) {
+            return Material.BROWN_STAINED_GLASS;
+        }
+        return material;
+    }
+
     private void clearView(UUID uuid, String nodeId) {
         Map<String, List<Location>> views = hiddenViews.get(uuid);
         if (views == null) return;
         views.remove(nodeId);
         if (views.isEmpty()) hiddenViews.remove(uuid);
-    }
-
-    private Block findLowestLog(List<Block> blocks, Block fallback) {
-        Block lowest = null;
-        for (Block block : blocks) {
-            if (!Tag.LOGS.isTagged(block.getType())) continue;
-            if (lowest == null || block.getY() < lowest.getY()) lowest = block;
-        }
-        return lowest == null ? fallback : lowest;
-    }
-
-    private boolean sameBlock(Block a, Block b) {
-        return a.getWorld().equals(b.getWorld())
-                && a.getX() == b.getX()
-                && a.getY() == b.getY()
-                && a.getZ() == b.getZ();
     }
 }
