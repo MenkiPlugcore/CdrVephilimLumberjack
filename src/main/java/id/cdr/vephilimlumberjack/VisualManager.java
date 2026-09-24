@@ -65,6 +65,12 @@ public final class VisualManager {
         if (playerViews.isEmpty()) hiddenViews.remove(player.getUniqueId());
     }
 
+    public void restoreIfReady(Player player, TreeNode node) {
+        if (plugin.cooldowns().remainingMillis(player.getUniqueId(), node.id()) <= 0L) {
+            restoreFor(player, node.id());
+        }
+    }
+
     public void restoreAll(Player player) {
         Map<String, List<Location>> playerViews = hiddenViews.remove(player.getUniqueId());
         if (playerViews == null) return;
@@ -79,15 +85,24 @@ public final class VisualManager {
 
     public void scheduleRestore(Player player, TreeNode node, long delayMillis) {
         long ticks = Math.max(1L, (delayMillis + 49L) / 50L);
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (!player.isOnline()) {
-                clearView(player.getUniqueId(), node.id());
-                return;
-            }
-            if (!plugin.cooldowns().isCooling(player.getUniqueId(), node.id())) {
-                restoreFor(player, node.id());
-            }
-        }, ticks);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> checkAndRestore(player, node), ticks);
+    }
+
+    private void checkAndRestore(Player player, TreeNode node) {
+        if (!player.isOnline()) {
+            clearView(player.getUniqueId(), node.id());
+            return;
+        }
+
+        long remaining = plugin.cooldowns().remainingMillis(player.getUniqueId(), node.id());
+        if (remaining <= 0L) {
+            restoreFor(player, node.id());
+            return;
+        }
+
+        // A Bukkit tick can run a few milliseconds before the wall-clock cooldown expires.
+        // Reschedule for the exact remaining time so the client-side tree can never stay stuck as a stump.
+        scheduleRestore(player, node, remaining);
     }
 
     public void reapplyActiveCooldowns(Player player) {
@@ -97,7 +112,10 @@ public final class VisualManager {
                 TreeNode node = plugin.nodes().get(nodeId);
                 if (node == null) continue;
                 long remaining = plugin.cooldowns().remainingMillis(player.getUniqueId(), nodeId);
-                if (remaining <= 0L) continue;
+                if (remaining <= 0L) {
+                    restoreFor(player, nodeId);
+                    continue;
+                }
                 hideFor(player, node);
                 scheduleRestore(player, node, remaining);
             }
