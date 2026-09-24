@@ -2,7 +2,7 @@
 
 MMORPG-style lumber gathering for Vephilim Roleplay.
 
-## v0.1.0 Core Concept
+## v0.1.1 Core Concept
 
 - Diamond Axe only.
 - Admin-defined logging nodes.
@@ -13,6 +13,8 @@ MMORPG-style lumber gathering for Vephilim Roleplay.
 - Vanilla trees outside registered nodes are unaffected.
 - Timber uses PersistentDataContainer tags so it is distinct from vanilla logs.
 - Designed to be sold through NPC shops in CdrVephilimEconomy.
+- Player-facing feedback is ActionBar only. Lumberjack gameplay does not write status text into chat.
+- Player-issued admin command responses also use ActionBar; console output remains normal text.
 
 ## Commands
 
@@ -22,6 +24,7 @@ MMORPG-style lumber gathering for Vephilim Roleplay.
 - `/lumber node info <id>` - inspect a node.
 - `/lumber timber give <player> [amount]` - give the tagged Timber item, useful for NPC shop setup.
 - `/lumber reload` - reload configuration and node data.
+- `/lumber status` - show compact runtime status.
 
 ## Requirements
 
@@ -34,7 +37,7 @@ MMORPG-style lumber gathering for Vephilim Roleplay.
 mvn clean package
 ```
 
-Output: `target/CdrVephilimLumberjack-0.1.0.jar`
+Output: `target/CdrVephilimLumberjack-0.1.1.jar`
 
 ## License
 
