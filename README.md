@@ -2,7 +2,7 @@
 
 MMORPG-style lumber gathering for Vephilim Roleplay.
 
-## v0.1.2 Core Concept
+## v0.1.4 Core Concept
 
 - Diamond Axe only.
 - Admin-defined logging nodes.
@@ -12,7 +12,11 @@ MMORPG-style lumber gathering for Vephilim Roleplay.
 - Registered leaves are protected as part of the tree and cannot be broken through vanilla mechanics.
 - One custom resource: `Vephilim Timber`.
 - Per-player node cooldowns, not global cooldowns.
-- Per-player harvested-tree visuals hide the full captured tree, including leaves, while leaving a stump.
+- During cooldown, the harvested tree remains visibly solid for that player instead of becoming invisible AIR.
+- Logs are shown as stripped variants of the same wood type while keeping their original axis.
+- Leaves use a configurable solid harvested material, defaulting to `BROWN_STAINED_GLASS`.
+- This avoids ghost-block situations where the player sees empty space but still collides with the real server tree.
+- When cooldown ends, the exact original trunk, branches, and leaves are restored for that player.
 - Vanilla trees outside registered nodes are unaffected.
 - Timber uses PersistentDataContainer tags so it is distinct from vanilla logs.
 - Designed to be sold through NPC shops in CdrVephilimEconomy.
@@ -41,7 +45,7 @@ MMORPG-style lumber gathering for Vephilim Roleplay.
 mvn clean package
 ```
 
-Output: `target/CdrVephilimLumberjack-0.1.2.jar`
+Output: `target/CdrVephilimLumberjack-0.1.4.jar`
 
 ## License
 
