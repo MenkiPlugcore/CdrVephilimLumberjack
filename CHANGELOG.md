@@ -1,14 +1,25 @@
 # Changelog
 
+## 0.1.2
+
+Whole-tree node patch.
+
+- One registered node now represents the full tree instead of only the selected anchor log.
+- Connected logs and nearby leaves are captured and stored as node members.
+- Existing legacy anchor-only nodes are automatically migrated on load.
+- Any registered trunk/canopy block is protected from vanilla breaking.
+- Chopping progress can be triggered from any registered log in the same tree.
+- Leaves are protected as part of the node but do not count as chopping hits.
+- Per-player harvested visuals now hide the entire captured tree, including leaves, while keeping one stump.
+- Admin node creation/info feedback now shows the captured whole-tree block count.
+
 ## 0.1.1
 
 ActionBar-only player UI patch.
 
-- Routed all lumber gameplay feedback to ActionBar only.
-- Routed player-issued admin command feedback to ActionBar instead of chat.
-- Kept console command output as normal text because console has no ActionBar.
-- Consolidated multi-line command status into compact single-line ActionBar output.
-- No lumber gameplay messages are written into player chat.
+- Routed all player-facing Lumberjack gameplay feedback to ActionBar.
+- Routed player-issued admin command responses to ActionBar.
+- Console output remains standard text because console has no ActionBar.
 
 ## 0.1.0
 
