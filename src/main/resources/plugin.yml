@@ -1,0 +1,36 @@
+name: CdrVephilimLumberjack
+version: '0.1.0'
+main: id.cdr.vephilimlumberjack.CdrVephilimLumberjack
+api-version: '1.21.11'
+authors: [MenkiPlugcore]
+description: MMORPG-style per-player lumber gathering for Vephilim Roleplay.
+website: https://github.com/MenkiPlugcore/CdrVephilimLumberjack
+softdepend: [CdrVephilimEconomy]
+
+commands:
+  lumber:
+    description: Manage Vephilim lumber nodes and Timber items.
+    usage: /lumber <node|timber|reload|status>
+    aliases: [vlumber, lumberjack]
+
+permissions:
+  cdrvephilimlumberjack.admin:
+    description: Full administrative access to CdrVephilimLumberjack.
+    default: op
+    children:
+      cdrvephilimlumberjack.node: true
+      cdrvephilimlumberjack.timber: true
+      cdrvephilimlumberjack.reload: true
+      cdrvephilimlumberjack.status: true
+  cdrvephilimlumberjack.node:
+    description: Create, remove, list, and inspect logging nodes.
+    default: op
+  cdrvephilimlumberjack.timber:
+    description: Give Vephilim Timber items.
+    default: op
+  cdrvephilimlumberjack.reload:
+    description: Reload the plugin configuration and node data.
+    default: op
+  cdrvephilimlumberjack.status:
+    description: View plugin runtime status.
+    default: op

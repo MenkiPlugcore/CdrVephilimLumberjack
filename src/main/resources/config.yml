@@ -1,0 +1,29 @@
+settings:
+  required-tool: DIAMOND_AXE
+  hits-required: 3
+  hit-delay-ms: 650
+  progress-reset-ms: 5000
+  node-cooldown-seconds: 30
+  durability-per-hit: 1
+  reward-amount: 1
+
+visual:
+  enabled: true
+  stump-material: STRIPPED_OAK_LOG
+  scan-radius: 7
+  leaf-radius: 2
+  max-blocks: 160
+
+resource:
+  material: OAK_LOG
+  name: '&6Vephilim Timber'
+  lore:
+    - '&7Timber gathered from a Vephilim logging node.'
+    - '&8Trade Resource'
+
+messages:
+  prefix: '&8[&6Vephilim Lumber&8] &r'
+  wrong-tool: '&cGunakan Diamond Axe untuk menebang pohon ini.'
+  cooldown: '&7Pohon ini sedang tumbuh kembali. &f{seconds}s'
+  progress: '&6Menebang... &f{bar} &7({hit}/{max})'
+  harvested: '&a+{amount} Vephilim Timber'
