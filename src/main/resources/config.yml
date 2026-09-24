@@ -24,6 +24,7 @@ resource:
 messages:
   prefix: '&8[&6Vephilim Lumber&8] &r'
   wrong-tool: '&cGunakan Diamond Axe untuk menebang pohon ini.'
+  hit-leaves: '&eTebang bagian batang pohon.'
   cooldown: '&7Pohon ini sedang tumbuh kembali. &f{seconds}s'
   progress: '&6Menebang... &f{bar} &7({hit}/{max})'
   harvested: '&a+{amount} Vephilim Timber'
