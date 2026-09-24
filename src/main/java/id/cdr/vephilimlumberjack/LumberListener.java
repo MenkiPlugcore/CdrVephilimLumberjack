@@ -1,6 +1,7 @@
 package id.cdr.vephilimlumberjack;
 
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.Tag;
@@ -19,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -49,6 +51,15 @@ public final class LumberListener implements Listener {
 
         if (!Tag.LOGS.isTagged(block.getType())) {
             action(player, plugin.message("messages.hit-leaves", "&eTebang bagian batang pohon."));
+            return;
+        }
+
+        double maxDistance = Math.max(0.0D, plugin.getConfig().getDouble("chop-range.max-distance", 3.5D));
+        if (plugin.getConfig().getBoolean("chop-range.enabled", true)
+                && maxDistance > 0.0D
+                && !isNearTree(player, node, maxDistance)) {
+            action(player, plugin.message("messages.too-far", "&cTerlalu jauh dari pohon. &7Maks. &f{distance} blok")
+                    .replace("{distance}", formatDistance(maxDistance)));
             return;
         }
 
@@ -129,6 +140,39 @@ public final class LumberListener implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         states.remove(event.getPlayer().getUniqueId());
+    }
+
+    private boolean isNearTree(Player player, TreeNode node, double maxDistance) {
+        Location location = player.getLocation();
+        double maxDistanceSquared = maxDistance * maxDistance;
+
+        for (Block treeBlock : plugin.nodes().blocks(node)) {
+            if (!Tag.LOGS.isTagged(treeBlock.getType())) continue;
+            if (!treeBlock.getWorld().equals(location.getWorld())) continue;
+            if (distanceSquaredToBlock(location, treeBlock) <= maxDistanceSquared) return true;
+        }
+
+        Block root = node.block();
+        return root != null
+                && root.getWorld().equals(location.getWorld())
+                && distanceSquaredToBlock(location, root) <= maxDistanceSquared;
+    }
+
+    private double distanceSquaredToBlock(Location location, Block block) {
+        double dx = axisDistance(location.getX(), block.getX(), block.getX() + 1.0D);
+        double dy = axisDistance(location.getY(), block.getY(), block.getY() + 1.0D);
+        double dz = axisDistance(location.getZ(), block.getZ(), block.getZ() + 1.0D);
+        return (dx * dx) + (dy * dy) + (dz * dz);
+    }
+
+    private double axisDistance(double value, double min, double max) {
+        if (value < min) return min - value;
+        if (value > max) return value - max;
+        return 0.0D;
+    }
+
+    private String formatDistance(double distance) {
+        return String.format(Locale.US, "%.1f", distance);
     }
 
     private void damageTool(Player player, ItemStack item, int amount) {
