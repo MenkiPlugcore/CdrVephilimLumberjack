@@ -22,6 +22,19 @@ resource:
     - '&7Timber gathered from a Vephilim logging node.'
     - '&8Trade Resource'
 
+npc-sell:
+  enabled: true
+  interaction-cooldown-ms: 750
+  # Masukkan Citizens NPC ID di bawah ini.
+  # Setiap NPC dapat memiliki harga Vephilim Timber yang berbeda.
+  # Contoh:
+  # npcs:
+  #   '12':
+  #     price-per-timber: 250.0
+  #   '27':
+  #     price-per-timber: 300.0
+  npcs: {}
+
 messages:
   prefix: '&8[&6Vephilim Lumber&8] &r'
   wrong-tool: '&cGunakan Diamond Axe untuk menebang pohon ini.'
@@ -29,3 +42,7 @@ messages:
   cooldown: '&7Pohon ini sedang tumbuh kembali. &f{seconds}s'
   progress: '&6Menebang... &f{bar} &7({hit}/{max})'
   harvested: '&a+{amount} Vephilim Timber'
+  npc-no-timber: '&eKamu tidak memiliki Vephilim Timber untuk dijual.'
+  npc-sold: '&aTerjual &f{amount} Timber &7| &a+{money}'
+  npc-sale-failed: '&cPenjualan gagal. Timber kamu sudah dikembalikan.'
+  npc-invalid-price: '&cNPC pembeli Timber ini belum memiliki harga yang valid.'
