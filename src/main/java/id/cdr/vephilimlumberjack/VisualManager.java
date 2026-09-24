@@ -8,15 +8,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 public final class VisualManager {
@@ -29,11 +24,13 @@ public final class VisualManager {
 
     public void hideFor(Player player, TreeNode node) {
         if (!plugin.getConfig().getBoolean("visual.enabled", true)) return;
-        Block root = node.block();
-        if (root == null) return;
 
-        List<Block> visualBlocks = captureTree(root);
-        if (visualBlocks.isEmpty()) visualBlocks = List.of(root);
+        List<Block> visualBlocks = plugin.nodes().blocks(node);
+        Block root = node.block();
+        if (visualBlocks.isEmpty() && root != null) visualBlocks = List.of(root);
+        if (visualBlocks.isEmpty()) return;
+
+        Block stumpBlock = findLowestLog(visualBlocks, root);
 
         Material stump = Material.matchMaterial(plugin.getConfig().getString("visual.stump-material", "STRIPPED_OAK_LOG"));
         if (stump == null || !stump.isBlock()) stump = Material.STRIPPED_OAK_LOG;
@@ -43,7 +40,7 @@ public final class VisualManager {
         List<Location> changed = new ArrayList<>();
         for (Block block : visualBlocks) {
             changed.add(block.getLocation());
-            if (sameBlock(block, root)) {
+            if (stumpBlock != null && sameBlock(block, stumpBlock)) {
                 player.sendBlockChange(block.getLocation(), stumpData);
             } else {
                 player.sendBlockChange(block.getLocation(), air);
@@ -114,68 +111,13 @@ public final class VisualManager {
         if (views.isEmpty()) hiddenViews.remove(uuid);
     }
 
-    private List<Block> captureTree(Block root) {
-        if (!isLog(root.getType())) return List.of(root);
-
-        int scanRadius = Math.max(1, plugin.getConfig().getInt("visual.scan-radius", 7));
-        int leafRadius = Math.max(0, plugin.getConfig().getInt("visual.leaf-radius", 2));
-        int maxBlocks = Math.max(1, plugin.getConfig().getInt("visual.max-blocks", 160));
-
-        Set<Block> logs = new LinkedHashSet<>();
-        Set<Block> visited = new HashSet<>();
-        Deque<Block> queue = new ArrayDeque<>();
-        queue.add(root);
-        visited.add(root);
-
-        while (!queue.isEmpty() && logs.size() < maxBlocks) {
-            Block current = queue.removeFirst();
-            if (!isLog(current.getType())) continue;
-            logs.add(current);
-
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
-                    for (int dz = -1; dz <= 1; dz++) {
-                        if (dx == 0 && dy == 0 && dz == 0) continue;
-                        Block next = current.getRelative(dx, dy, dz);
-                        if (visited.contains(next)) continue;
-                        if (!withinRadius(root, next, scanRadius)) continue;
-                        visited.add(next);
-                        if (isLog(next.getType())) queue.addLast(next);
-                    }
-                }
-            }
+    private Block findLowestLog(List<Block> blocks, Block fallback) {
+        Block lowest = null;
+        for (Block block : blocks) {
+            if (!Tag.LOGS.isTagged(block.getType())) continue;
+            if (lowest == null || block.getY() < lowest.getY()) lowest = block;
         }
-
-        LinkedHashSet<Block> result = new LinkedHashSet<>(logs);
-        if (leafRadius > 0) {
-            for (Block log : logs) {
-                if (result.size() >= maxBlocks) break;
-                for (int dx = -leafRadius; dx <= leafRadius && result.size() < maxBlocks; dx++) {
-                    for (int dy = -leafRadius; dy <= leafRadius && result.size() < maxBlocks; dy++) {
-                        for (int dz = -leafRadius; dz <= leafRadius && result.size() < maxBlocks; dz++) {
-                            Block candidate = log.getRelative(dx, dy, dz);
-                            if (!withinRadius(root, candidate, scanRadius + leafRadius)) continue;
-                            if (isLeaf(candidate.getType())) result.add(candidate);
-                        }
-                    }
-                }
-            }
-        }
-        return new ArrayList<>(result);
-    }
-
-    private boolean withinRadius(Block root, Block other, int radius) {
-        return Math.abs(root.getX() - other.getX()) <= radius
-                && Math.abs(root.getY() - other.getY()) <= radius
-                && Math.abs(root.getZ() - other.getZ()) <= radius;
-    }
-
-    private boolean isLog(Material material) {
-        return Tag.LOGS.isTagged(material);
-    }
-
-    private boolean isLeaf(Material material) {
-        return Tag.LEAVES.isTagged(material);
+        return lowest == null ? fallback : lowest;
     }
 
     private boolean sameBlock(Block a, Block b) {
